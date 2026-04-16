@@ -1,20 +1,31 @@
-import { useState, type Dispatch } from "react"
+import { useState, type Dispatch, useEffect } from "react"
+import {v4 as uuidv4} from 'uuid'
 import { categories } from "../data/categories"
 import type { Activity } from "../types"
-import type { ActivityActions } from "../reducers/activity-reducer"
+import type { ActivityActions, ActivityState } from "../reducers/activity-reducer"
 
 type FormProps = {
-    dispatch : Dispatch<ActivityActions>
+    dispatch : Dispatch<ActivityActions>,
+    state: ActivityState
 }
 
-const initialState = {
+const initialState : Activity= {
+        id: uuidv4(),
         category: 1,
         name: '',
         calories: 0
     }
-export default function Form({dispatch} : FormProps) {
+
+export default function Form({dispatch, state} : FormProps) {
 
     const [activity, setActivity] = useState<Activity>(initialState)
+
+    useEffect(() => {
+        if(state.activeId){
+            const selectedActivity = state.activities.filter(stateActivity => stateActivity.id === state.activeId)[0]
+            setActivity(selectedActivity)
+        }
+    }, [state.activeId, state.activities])
 
     //Coloca el "e" en el cambpo onChange de los inputs para saber el tipo de dato
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>| React.ChangeEvent<HTMLInputElement> ) =>{
@@ -27,14 +38,15 @@ export default function Form({dispatch} : FormProps) {
 
     const isValidActivity = () => {
         const {name, calories} = activity
-        console.log()
         return name.trim() !=='' && calories > 0
     }
 
     const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault()
         dispatch({type : 'save-activity', payload:{newActivity: activity}})
-        setActivity(initialState)
+        setActivity({
+            ...initialState, id: uuidv4() //Reescribir el ID para que no se duplique cuando se envia el formulario
+        })
     }
 
   return (
