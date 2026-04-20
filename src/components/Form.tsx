@@ -27,7 +27,7 @@ export default function Form({dispatch, state} : FormProps) {
         }
     }, [state.activeId, state.activities])
 
-    //Coloca el "e" en el cambpo onChange de los inputs para saber el tipo de dato
+    //Coloca el "e" en el campo onChange de los inputs para saber el tipo de dato
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>| React.ChangeEvent<HTMLInputElement> ) =>{
         const isNumberField = ['category', 'calories'].includes(e.target.id)
         setActivity({
